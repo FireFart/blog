@@ -6,8 +6,8 @@ metakeys = ["cron", "cron jobs", "docker", "docker-compose"]
 
 +++
 
-Lately I came across the problem of running some cron jobs in a docker based environment when we migrated [wpvulndb.com](https://wpvulndb.com) to a docker based install.
-So how to execute cron jobs when the application is running with docker or docker-compose?
+Lately I came across the problem of running cron jobs in a docker based environment when we migrated [wpvulndb.com](https://wpvulndb.com) to a docker based install.
+So how should we execute cron jobs when the application is running with docker or docker-compose?
 
 <!--more-->
 
@@ -23,7 +23,7 @@ For example this was one of our cron jobs executed from the host inside the appl
 /bin/bash -c 'cd /opt/wpvulndb/ && docker-compose -f docker-compose.yml -f docker-compose.staging.yml -f docker-compose.prod.yml run -T --name cron_sitemap --rm cron bundle exec rake -s sitemap:refresh'"
 ```
 
-The `cron` container in this case was just a copy of the main application container. We could also execute `docker-compose exec` (or `docker exec`) to run the command in the application container but we created a separate container so we do not interrupt any processes inside the main container.
+The `cron` container in this case was just another instance of the main application image. We could also execute `docker-compose exec` (or `docker exec`) to run the command in the main application container but we created a separate container so we do not interrupt any processes inside the main container.
 
 But there is one simple problem with this setup:
 
@@ -36,12 +36,12 @@ Starting wpvulndb_web
 ```
 This ended up with a lot of emails for every cron job although we are only interested in errors.
 
-So my choice for running the cron jobs was directly inside an container. There are some blog posts and stack overflow comments about this topic out there but either they are really old or miss some details.
+So my choice for running the cron jobs was directly inside an container. There are some blog posts and stack overflow comments about this topic out there but either they are really old or miss some important details.
 
 One thing you find a lot on the internet is something like: `cron && tail -f /var/log/cron.log` as the main docker command - This is bad
 
-This command would execute cron and tails the log file so it will be visible with `docker logs`. But there is an edge case on this.
-If the cron daemon fails after some time the docker container will continue to run because it tails the log file and does not monitor the cron process as it should be. So it looks like your cron jobs are running - but they don't, only the tail of the log file is running.
+This command would execute cron and tails the log file so it will be visible with `docker logs`. But there is an problem with this:
+If the cron daemon fails after some time the docker container will continue to run because it tails the log file and does not monitor the cron process as it should be. The crash of crond will be undetected. So from outside the container it looks like your cron jobs are running - but they don't. Only the tail of the log file is running, beeing monitored by docker and reported as UP.
 
 You should try to only have one main process running inside the container so the docker engine can monitor the health of your containers and restart them if needed or notify you.
 
@@ -69,8 +69,7 @@ CMD ["-f", "-d", "8"]
 
 `crontab` file:
 ```
-# Refresh sitemap
-0 2 * * * bundle exec rake -s sitemap:refresh
+0 2 * * * /bin/date
 ```
 
 The cron daemon parameters in use are:
@@ -78,7 +77,7 @@ The cron daemon parameters in use are:
 - `-f`: The cron daemon will run in the foreground. This way docker is able to monitor the process.
 - `-d 8`: This instructs the daemon to log to stderr with the default log level 8. Without this flag messages are only written to syslog and you can't access them via the `logs` command.
 
-Using this method of cron involves monitoring the logs of the container using some kind of monitoring like a log management or send the output from  the jobs itself as email.
+Using this method of cron involves monitoring the logs of the container using some kind of monitoring like a log management or send the output from the jobs itself as email.
 
 The cron files on alpine Linux work like this:
 
@@ -111,7 +110,7 @@ This file contains cronjobs that should be executed by the user matching the fil
 
 You can also integrate the steps mentioned above inside your main Dockerfile (if it's based on an alpine based image) and change the entrypoint and command to the cron commands if you need access to the main application for the cron jobs.
 
-For example our `docker-compose.yml` file uses the following snippet on the main Dockerfile to also use it as a cron container (the `user: root` is important as the cron daemon needs to run as root):
+For example our `docker-compose.yml` file uses the following snippet on the main Dockerfile to use it as a cron container with a different entrypoint (the `user: root` is important as the cron daemon needs to run as root):
 ```
 entrypoint: ""
 user: root

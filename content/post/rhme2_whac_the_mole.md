@@ -2,7 +2,7 @@
 Description = "rhme2 - Solving the whac the mole challenge"
 title = "rhme2 - Solving the whac the mole challenge"
 date = "2017-05-30T20:00:00+01:00"
-metakeys = ["rhme2", "whac the mole", "hacking", "arduino", "hardware", "rs232", "baud rate", "oscilloscope"]
+metakeys = ["rhme2", "whac the mole", "hacking", "arduino", "hardware", "rs232", "serial", "baud rate", "oscilloscope"]
 +++
 
 RHme2 (Riscure Hack me 2) was a hardware based CTF challenge started back in 2016. Although it's already over you can download the challenges from their [Github page](https://github.com/Riscure/Rhme-2016).
@@ -26,9 +26,9 @@ avrdude -c arduino -p atmega328p -P /dev/ttyUSB0 -b57600 -u -V -U flash:w:whac_t
 
 The first thing to check is if there is anything being sent via the serial interface. We could just bruteforce the baudrate used by the firmware but as we already need an oscilloscope for this challenge let's go the l33t way.
 
-The RS232 protocol uses the RX and TX pins. RX is the receive and TX the transmit pin. So if we hook our oscilloscope to the TX pin of the Arduino Nano we can see some data being sent after hitting the reset pin. If you connect your Arduino Nano to a PC via USB the output will also show up in the serial console.
+UART uses the RX and TX pins - RX is the receive and TX the transmit pin. So if we hook our oscilloscope to the TX pin of the Arduino Nano we can see some data being sent after hitting the reset pin. If you connect your Arduino Nano to a PC via USB the output will also show up in the serial console.
 
-If data is sent via the [RS232 protocol](https://learn.sparkfun.com/tutorials/serial-communication/rules-of-serial) the voltage drops from HIGH (+5V) to LOW (0V). So we set the oscilloscope trigger to falling edge, enable single shot mode and press the reset pin on the Arduino. We now have some data packages and need to extract the baud rate from it. The first drop from high to low on each package is the start bit followed by the data and the stop bit. By zooming in on a package we can measure the width of the shortest pulse and simply calculate *1/width* or simply read the data on the oscilloscope. The width in this example is *54µs* so the calculation is *1/(54\*10^-6)* which gives *18518.5185185* (*18.52k* which can also be read from the oscilloscope).
+If data is sent via the [serial protocol](https://learn.sparkfun.com/tutorials/serial-communication/rules-of-serial) the voltage drops from HIGH (+5V) to LOW (0V). So we set the oscilloscope trigger to falling edge, enable single shot mode and press the reset pin on the Arduino. We now have some data packages and need to extract the baud rate from it. The first drop from high to low on each package is the start bit followed by the data and the stop bit. By zooming in on a package we can measure the width of the shortest pulse and simply calculate *1/width* or simply read the data on the oscilloscope. The width in this example is *54µs* so the calculation is *1/(54\*10^-6)* which gives *18518.5185185* (*18.52k* which can also be read from the oscilloscope).
 
 ![baud rate](/img/rhme2/whac_the_mole/baud_rate.png)
 
