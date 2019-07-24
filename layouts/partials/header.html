@@ -37,9 +37,11 @@
 
     <link rel="stylesheet" href='{{ "css/all.min.css" | absURL }}'>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-    {{ if .RSSLink }}
-    <link href="{{ .RSSLink }}" rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" />
-    <link href="{{ .RSSLink }}" rel="feed" type="application/rss+xml" title="{{ .Site.Title }}" />
+
+    {{ $rss := .OutputFormats.Get "RSS" }}
+    {{ if $rss }}
+    <link href="{{ $rss.RelPermalink }}" rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" />
+    <link href="{{ $rss.RelPermalink }}" rel="feed" type="application/rss+xml" title="{{ .Site.Title }}" />
     {{ end }}
     <script type="application/ld+json">
     [
