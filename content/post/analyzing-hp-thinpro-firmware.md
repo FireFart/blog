@@ -19,19 +19,19 @@ After you finished the download you will get an exe containing the firmware. Run
 
 This will give you a gz image. Transfer this image to your favorite linux box (I used kali) und run gunzip to unzip it
 
-```
+```bash
 gunzip T6X43101.dd.gz
 ```
 
 Now you have a .dd file, which is a raw ext3 disk image created with the dd command.
 
-```
+```text
 T6X43101.dd: x86 boot sector; GRand Unified Bootloader, stage1 version 0x3, 1st sector stage2 0x1380c5; partition 1: ID=0x83, active, starthead 1, startsector 63, 2001825 sectors, code offset 0x48
 ```
 
 Here is the binwalk output from this file
 
-```
+```text
 DECIMAL         HEX             DESCRIPTION
 -------------------------------------------------------------------------------------------------------------------
 32256           0x7E00          Linux EXT filesystem, rev 1.0 ext3 filesystem data, UUID=c0cba688-cc23-404f-a7fb-d67fde13de13, volume name "ROOT"
@@ -47,11 +47,11 @@ DECIMAL         HEX             DESCRIPTION
 679509504       0x28807E00      Linux EXT filesystem, rev 1.0 ext3 filesystem data, UUID=c0cba688-cc23-404f-a7fb-d67fde13de13, volume name "ROOT"
 ```
 
-To convert this image to a VMware Harddisk you first need to install the package <b><i>qemu</i></b> (if you only want to browse this image, scroll down a bit).
+To convert this image to a VMware Harddisk you first need to install the package ***qemu*** (if you only want to browse this image, scroll down a bit).
 
 To start the conversion run the following command:
 
-```
+```text
 qemu-img convert -f raw -O vmdk T6X43101.dd thinpro.vmdk
 ```
 
@@ -63,7 +63,7 @@ Now you can boot and configure your very own "Thinclient" inside a VM :)
 
 If you just need to browse the image contents, run parted on the .dd image to get the offset (User input is bold) or just use the offset from the binwalk output above.
 
-```
+```text
 parted T6X43101.dd
 GNU Parted 2.3
 Using /media/psf/ThinClient/T6X43101.dd
@@ -82,20 +82,20 @@ Number  Start   End          Size         Type     File system  Flags
 
 Now mount the image with the correct offset
 
-```
+```bash
 mkdir /media/thinclient
 mount -o loop,ro,offset=32256 T6X43101.dd /media/thinclient/
 ```
 
 This will mount the dd image readonly and you will get some kernel images and the filesystem as a squashfs file. Install [firmware-mod-kit](https://code.google.com/p/firmware-mod-kit/) on your linux box so you get the tools needed to extract the filesystem.
 
-```
+```bash
 /root/firmware-mod-kit/unsquashfs_all.sh /media/thinclient/filesystem.squash extract
 ```
 
 This will extract the harddisk content to the folder extract.
 
-```
+```bash
 root@kali:/media/psf/ThinClient/extract# ls -alh
 total 0
 drwxr-xr-x 1 root root  646 May 22 21:43 .
