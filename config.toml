@@ -11,8 +11,3 @@ disableHugoGeneratorInject = true
   githubName = "FireFart"
   description = "that austrian security guy"
   author = "Christian Mehlmauer"
-
-[taxonomies]
-  tag = ""
-  group = ""
-  category = ""

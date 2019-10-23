@@ -56,7 +56,7 @@ Here are the basics to set your machine up for getting the access keys.
 
 The first step is to set up libnfc so the OS can communicate with the NFC reader. You can get the latest libnfc version from [https://github.com/nfc-tools/libnfc/releases](https://github.com/nfc-tools/libnfc/releases). At the time of writing the current version was 1.7.1.
 
-```
+```bash
 apt-get install autoconf libtool libusb-dev libpcsclite-dev build-essential
 wget https://github.com/nfc-tools/libnfc/releases/download/libnfc-1.7.1/libnfc-1.7.1.tar.bz2
 tar -jxvf libnfc-1.7.1.tar.bz2
@@ -70,12 +70,14 @@ sudo mkdir /etc/nfc/devices.d
 ```
 
 When using the USB TTL cable issue the following command:
-```
+
+```bash
 sudo cp contrib/libnfc/pn532_via_uart2usb.conf.sample /etc/nfc/devices.d/pn532_via_uart2usb.conf
 ```
 
 If you connect the breakout board directly to your Raspberry PI's UART pins you need to copy the following file:
-```
+
+```bash
 sudo cp contrib/libnfc/pn532_uart_on_rpi.conf.sample /etc/nfc/devices.d/pn532_uart_on_rpi.conf
 ```
 
@@ -85,19 +87,21 @@ If you use Kali the libnfc library is already installed, but missing some driver
 
 After installing we need to test the communication to the NFC-reader. Connect your NFC device and run the following command
 
-```
+```text
 nfc-list
 ```
 
 it should output something like (example with USB-UART Cable)
-```
+
+```text
 # nfc-list
 nfc-list uses libnfc 1.7.1
 NFC device: pn532_uart:/dev/ttyUSB0 opened
 ```
 
 On a Raspberry Pi it shows
-```
+
+```text
 # nfc-list
 nfc-list uses libnfc 1.7.1
 NFC device: pn532_uart:/dev/ttyAMA0 opened
@@ -106,7 +110,8 @@ NFC device: pn532_uart:/dev/ttyAMA0 opened
 Now your reader is connected and we can start cracking our keys. We will use the tool "mfoc - Mifare Classic Offline Cracker" available from [https://github.com/nfc-tools/mfoc](https://github.com/nfc-tools/mfoc). Kali linux has it already installed.
 
 If you are not on KALI or you want the latest version of mfoc you need to compile it on your own by executing the following commands.
-```
+
+```bash
 wget -O mfoc-master.zip https://github.com/nfc-tools/mfoc/archive/master.zip
 unzip mfoc-master.zip
 cd mfoc-master/
@@ -114,13 +119,14 @@ cd mfoc-master/
 
 or clone via git
 
-```
+```bash
 git clone https://github.com/nfc-tools/mfoc.git
 cd mfoc/
 ```
 
 configure and install it
-```
+
+```bash
 autoreconf -vis
 ./configure
 make
@@ -128,7 +134,8 @@ make install
 ```
 
 To start the key cracking connect your reader, place the tag on the antenna and run
-```
+
+```bash
 mfoc -O output.mfd
 ```
 
@@ -138,7 +145,7 @@ If the tool outputs "Maybe you should increase the number of probes", the cracki
 
 If you manage to crack all the keys you can see the HEX encoded contents of the key on your terminal and also in the output file output.mfd.
 
-```
+```text
 # mfoc -O output.mfd
 Found Mifare Classic 1k tag
 ISO/IEC 14443A (106 kbps) target:
@@ -269,7 +276,8 @@ Block 00, type A, key a0a1a2a3a4a5 :8e  db  1a  2a  65  88  04  00  48  85  14  
 ```
 
 The terminal output is upside down - the first block containing the UID is at the bottom. If you view the output.mfd file with hexdump you can see it in the right order.
-```
+
+```text
 # hexdump -vC output.mfd
 00000000  8e db 1a 2a 65 88 04 00  48 85 14 90 59 80 01 11  |...*e...H...Y...|
 00000010  d2 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
@@ -338,7 +346,8 @@ The terminal output is upside down - the first block containing the UID is at th
 ```
 
 The file shows all 16 sectors. Here is an example of one sector: 3x16 bytes of data followed by 16 bytes of access keys and accecss bits.
-```
+
+```text
 Block 0 | 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
 Block 1 | 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
 Block 2 | 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
@@ -353,7 +362,7 @@ The next step is to locate the credits on the tag. The vending machine shows you
 
 So the tag currently contains exactly 3,45€. So lets first search for the Hex value of 45 (0x2d): Nothing found. Next we try to convert our 3,45€ to cents which will be 345 (0x01 0x59): Gotcha! The credits are located in sector 12 block 2 (counting starts at zero).
 
-```
+```text
 Block 0 | 88 01 00 84 00 04 b0 1a  00 00 5d 00 01 05 00 f1
 Block 1 | 01 01 01 ee ee ee ee ee  00 00 00 00 00 00 00 00
 Block 2 | 00 01 59 01 00 6f 00 01  00 00 00 00 8c c3 00 00
@@ -383,7 +392,8 @@ This app lets you add your own keyfile ("Add/Remove Keys") cracked by mfoc. Just
 [![write](/img/mifare/mifare_write_thumb.png "write")](/img/mifare/mifare_write.png)
 
 Another method is to reflash the captured output of mfoc via nfc-mfclassic:
-```
+
+```text
 # nfc-mfclassic w B output.mfd output.mfd
 NFC reader: pn532_uart:/dev/ttyUSB0 opened
 Found MIFARE Classic card:
