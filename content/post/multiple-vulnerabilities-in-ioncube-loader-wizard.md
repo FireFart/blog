@@ -2,8 +2,8 @@
 Description = "Multiple Vulnerabilities in ionCube Loader-wizard"
 title = "Multiple Vulnerabilities in ionCube Loader-wizard"
 date = "2014-03-30T12:00:00+01:00"
-
 +++
+
 In a recent security audit I spotted a file on the server which caught my attention: `loader-wizard.php`.
 
 After calling the file via a Browser I noticed it's part of ionCubes encoding and [obfuscation](http://en.wikipedia.org/wiki/Obfuscation) software. The software can be found on [ionCubes Homepage](http://www.ioncube.com/php_encoder.php).

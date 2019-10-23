@@ -2,8 +2,8 @@
 Description = "SQL-Injection and XSS in All-in-one-event-calendar Wordpress Plugin"
 title = "SQL-Injection and XSS in All-in-one-event-calendar Wordpress Plugin"
 date = "2013-11-14T22:05:00+01:00"
-
 +++
+
 During a recent security audit I found multiple vulnerabilities in the Wordpress plugin "all-in-one-event-calendar".
 There is a lite version provided through the Wordpress site ([http://wordpress.org/plugins/all-in-one-event-calendar/](http://wordpress.org/plugins/all-in-one-event-calendar/)), and a standard version provided through a third party site ([http://time.ly/](http://time.ly/)).
 Both versions were tested and are vulnerable to the reported issues.

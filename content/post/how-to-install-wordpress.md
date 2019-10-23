@@ -2,8 +2,8 @@
 Description = "How to Install Wordpress"
 title = "How to Install Wordpress"
 date = "2014-07-03T17:48:00+01:00"
-
 +++
+
 Because I have installed Wordpress for testing purposes way too often, i decided to write my setup down so I can reference it and others can benefit from the install.
 The installation was tested with Ubuntu 14.04 LTS 64bit.
 

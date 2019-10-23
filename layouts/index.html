@@ -7,8 +7,7 @@
         <div>
             <!-- A wrapper for all the blog posts -->
             <div class="posts">
-              {{ $paginator := .Paginate (where .Data.Pages "Type" "post") }}
-              {{ range $paginator.Pages }}
+                {{ range .Paginator.Pages }}
                 <h1 class="content-subhead">{{ .Date.Format "02 Jan 2006, 15:04" }}</h1>
                 <section class="post">
                     <header class="post-header">
@@ -21,7 +20,9 @@
                             {{ end }}
                             {{ if isset .Params "categories" }}
                                 under
-                                {{ range .Params.categories }}<a class="post-category post-category-{{ . }}" href="/categories/{{ . | urlize }}">{{ . }}</a>{{ end }}
+                                {{ range .Params.categories }}
+                                    <a class="post-category post-category-{{ . }}" href='{{ ( printf "categories/%s" . ) | absURL }}'>{{ . }}</a>
+                                {{ end }}
                             {{ end }}
                         </p>
                     </header>

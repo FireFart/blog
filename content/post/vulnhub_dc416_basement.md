@@ -4,7 +4,6 @@ title = "Vulnhub - DC416: Basement Writeup"
 date = "2016-12-18T01:00:00+01:00"
 metakeys = ["vulnhub", "walkthrough", "writeup", "DC416", "basement"]
 image = "/img/misc/vulnhub.png"
-
 +++
 
 Basement is the first of 4 VMs from the DC416 CTF by [@barrebas](https://twitter.com/barrebas) on [Vulnhub](https://www.vulnhub.com/entry/dc416-2016,168/). There are 5 flags on this machine but I was only able to get 4 of them.

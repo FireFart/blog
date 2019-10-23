@@ -2,8 +2,8 @@
 Description = "How to Crack Mifare Classic Cards"
 title = "How to Crack Mifare Classic Cards"
 date = "2015-04-21T19:20:00+01:00"
-
 +++
+
 In this blog post I will cover some quick basics about NFC, Mifare Classic and how to set up everything for reading and writing a NFC tag. At the end I show you how to reprogram a vending machine's NFC tag to contain more credits.
 
 NFC stands for Near Field Communication and is used to communicate over short distances. For more Infos on NFC you can read the [Wikipedia article](http://en.wikipedia.org/wiki/Near_field_communication). NFC nowadays is used for access cards, public transport, some more and in this case: Vending Machines. Basically there is an active NFC enabled device (the reader) and a passive device (the tag). The active device scans for the passive one and establishes a connection on contact. It also powers the passive device via an electromagnetic field. There is also an active - active mode where both endpoints can send data and need to be powered seperately. This is usually used when sending data for example in "Android Beam".

@@ -4,7 +4,6 @@ title = "Vulnhub - DC416: Baffle Writeup"
 date = "2017-01-02T22:00:00+01:00"
 metakeys = ["vulnhub", "walkthrough", "writeup", "DC416", "baffle"]
 image = "/img/misc/vulnhub.png"
-
 +++
 
 After I finished [DC416 - Basement](/post/vulnhub_dc416_basement/) I wanted to give the next VM a try: [DC416 - baffle](https://www.vulnhub.com/entry/dc416-2016,168/) by [@superkojiman](https://twitter.com/superkojiman).

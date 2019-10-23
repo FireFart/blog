@@ -1,9 +1,7 @@
 +++
-Description = ""
-Tags = []
+Description = "About"
 date = "2011-01-10T22:52:52+01:00"
 title = "about"
-
 +++
 
 ![Christian Mehlmauer](https://www.gravatar.com/avatar/530ee2111e51f3d8379b1081d13bf345.png?s=200 "Christian Mehlmauer")
