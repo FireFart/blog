@@ -8,7 +8,7 @@ title = "about"
 
 ![E-Mail](/img/misc/email.png "E-Mail")
 
-[Twitter](https://twitter.com/_FireFart_)
+[Twitter](https://twitter.com/firefart)
 
 [Github](https://github.com/FireFart)
 

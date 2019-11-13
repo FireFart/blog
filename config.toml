@@ -7,7 +7,7 @@ ignoreFiles = [ "^\\.DS_Store$" ]
 disableHugoGeneratorInject = true
 
 [params]
-  twitterName = "_FireFart_"
+  twitterName = "firefart"
   githubName = "FireFart"
   description = "that austrian security guy"
   author = "Christian Mehlmauer"
