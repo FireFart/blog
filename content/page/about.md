@@ -12,7 +12,7 @@ title = "about"
 
 [Github](https://github.com/FireFart)
 
-[PGP Key](http://pgp.mit.edu/pks/lookup?search=0xDCF54A05D6E62591&op=index)
+[Linkedin](https://www.linkedin.com/in/firefart/)
 
 [Keybase.io](https://keybase.io/firefart)
 
