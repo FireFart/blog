@@ -22,6 +22,8 @@ title = "about"
 [![Metasploit](/img/misc/metasploit.png "Metasploit")](https://www.metasploit.com/)
 
 # Certifications
-[![OSCP](/img/misc/oscp.png "OSCP")](https://www.offensive-security.com/information-security-certifications/oscp-offensive-security-certified-professional/)
+[![OSCP](/img/misc/oscp.png "OSCP")](https://www.offensive-security.com/pwk-oscp/)
 
-[![OSCE](/img/misc/osce.png "OSCE")](https://www.offensive-security.com/information-security-certifications/osce-offensive-security-certified-expert/)
+[![OSCE](/img/misc/osce.png "OSCE")](https://www.offensive-security.com/ctp-osce/)
+
+[![OSWE](/img/misc/oswe.png "OSWE")](https://www.offensive-security.com/awae-oswe/)
