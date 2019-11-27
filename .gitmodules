@@ -1,3 +1,8 @@
 [submodule "themes/purehugo"]
 	path = themes/purehugo
 	url = https://github.com/dplesca/purehugo.git
+	branch = master
+[submodule "public"]
+	path = public
+	url = git@github.com:FireFart/firefart.github.io.git
+	branch = master

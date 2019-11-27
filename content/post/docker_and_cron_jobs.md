@@ -3,7 +3,6 @@ Description = "How to run cron jobs with docker"
 title = "How to run cron jobs with docker"
 date = "2017-11-06T00:30:00+01:00"
 metakeys = ["cron", "cron jobs", "docker", "docker-compose"]
-
 +++
 
 Lately I came across the problem of running cron jobs in a docker based environment when we migrated [wpvulndb.com](https://wpvulndb.com) to a docker based install.

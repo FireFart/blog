@@ -2,8 +2,8 @@
 Description = "Analyzing HP Thinpro Firmware"
 date = "2013-11-13T17:44:00+01:00"
 title = "Analyzing HP Thinpro Firmware"
-
 +++
+
 Today I got my hands on a [HP t510 Thinclient](http://www8.hp.com/us/en/campaigns/thin-client-solutions/t510.html) and wanted to analyze the OS and running services (apparently it's running Ubuntu 10.04.4 LTS).
 Here is my solution to run the Firmware in a VMware Infrastructure, or simply mount the image for browsing.
 

@@ -4,7 +4,6 @@ title = "Vulnhub - DC416: Dick Dastardly Writeup"
 date = "2017-01-10T23:00:00+01:00"
 metakeys = ["vulnhub", "walkthrough", "writeup", "DC416", "dickdastardly", "dick dastardly"]
 image = "/img/misc/vulnhub.png"
-
 +++
 
 New evening, new VM: [DC416 Dick Dastardly](https://www.vulnhub.com/entry/dc416-2016,168/) by the famous [@_RastaMouse](https://twitter.com/_RastaMouse).

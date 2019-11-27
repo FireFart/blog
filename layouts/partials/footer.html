@@ -8,7 +8,20 @@
 </div>
 <script type="text/javascript" src='{{ "js/all.min.js" | absURL }}'></script>
 <script type="text/javascript" src='{{ "js/firefart.js" | absURL }}'></script>
-<!-- Piwik -->
-<script type="text/javascript" src='{{ "js/anal.js" | absURL }}'></script>
-<noscript><p><img src="//firefart.at/pi.php?idsite=1" style="border:0;" alt="placeholder" /></p></noscript>
-<!-- End Piwik Code -->
+<!-- Matomo -->
+<script type="text/javascript">
+    var _paq = window._paq || [];
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(["setCookieDomain", "*.firefart.at"]);
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+        var u="https://tracking.firefart.at/";
+        _paq.push(['setTrackerUrl', u+'mat.php']);
+        _paq.push(['setSiteId', '1']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'mat.js'; s.parentNode.insertBefore(g,s);
+    })();
+</script>
+<noscript><p><img src="https://tracking.firefart.at/mat.php?idsite=1&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Matomo Code -->
