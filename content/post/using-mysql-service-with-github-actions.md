@@ -1,7 +1,7 @@
 +++
 Description = "Using the MySQL/MariaDB Service with Github Actions"
 title = "Using the MySQL Service with Github Actions"
-date = "2019-11-27T10:00:00+01:00"
+date = "2019-11-27T8:00:00+01:00"
 metakeys = ["github", "github actions", "mysql", "mariadb"]
 
 +++
