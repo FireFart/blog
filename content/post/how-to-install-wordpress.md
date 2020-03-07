@@ -69,7 +69,7 @@ set `DocumentRoot` to `/var/www/wordpress`
 a2dissite 000-default # disable default site
 a2ensite 001-wordpress # enable new wordpress site
 # set file upload size to something bigger then 2MB
-sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 20M/" /etc/php5/apache2/php.ini
+sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 20M/" /etc/php7.2/apache2/php.ini
 service apache2 restart
 ```
 
