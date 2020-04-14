@@ -14,21 +14,24 @@
                 {{ end }}
                 {{ if .Site.Params.githubName }}
                 <li class="nav-item">
-                     <a class="pure-button" target="_blank" href="https://github.com/{{ .Site.Params.githubName }}">
+                    <a class="pure-button" target="_blank" href="https://github.com/{{ .Site.Params.githubName }}">
                         <i class="fa fa-github-alt"></i>{{ if not .Site.Params.hideSidebarIconText }} Github{{ end }}
                     </a>
                 </li>
                 {{ end }}
                 {{ if .Site.Params.stackOverflowId }}
                 <li class="nav-item">
-                    <a class="pure-button" target="_blank" href="https://stackoverflow.com/u/{{ .Site.Params.stackOverflowId }}">
-                        <i class="fa fa-stack-overflow"></i>{{ if not .Site.Params.hideSidebarIconText }}Stack Overflow{{ end }}
+                    <a class="pure-button" target="_blank"
+                        href="https://stackoverflow.com/u/{{ .Site.Params.stackOverflowId }}">
+                        <i class="fa fa-stack-overflow"></i>{{ if not .Site.Params.hideSidebarIconText }}Stack
+                        Overflow{{ end }}
                     </a>
                 </li>
                 {{ end }}
                 {{ if .Site.Params.linkedinName }}
                 <li class="nav-item">
-                    <a class="pure-button" target="_blank" href="https://www.linkedin.com/in/{{ .Site.Params.linkedinName }}">
+                    <a class="pure-button" target="_blank"
+                        href="https://www.linkedin.com/in/{{ .Site.Params.linkedinName }}">
                         <i class="fa fa-linkedin"></i>{{ if not .Site.Params.hideSidebarIconText }} LinkedIn{{ end }}
                     </a>
                 </li>

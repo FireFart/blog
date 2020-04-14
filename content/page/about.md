@@ -17,11 +17,13 @@ title = "about"
 [Keybase.io](https://keybase.io/firefart)
 
 # Affilations
+
 [![WPScan](/img/misc/wpscan.png "WPScan")](http://wpscan.org)
 
 [![Metasploit](/img/misc/metasploit.png "Metasploit")](https://www.metasploit.com/)
 
 # Certifications
+
 [![OSCP](/img/misc/oscp.png "OSCP")](https://www.offensive-security.com/pwk-oscp/)
 
 [![OSCE](/img/misc/osce.png "OSCE")](https://www.offensive-security.com/ctp-osce/)

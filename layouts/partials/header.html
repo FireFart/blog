@@ -1,69 +1,74 @@
 <!doctype html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Title }}</title>
-    <meta name="description" content="{{ if .IsNode }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ else }}{{ with .Description }}{{ . }}{{ end }}{{ end }}">
-    {{ if .Params.metakeys }}
-    <meta name="keywords" content="{{ delimit .Params.metakeys ", " }}">
-    {{ end }}
-    <meta name="author" content="{{ .Site.Params.author }}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ .Title }}</title>
+  <meta name="description"
+    content="{{ if .IsNode }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ else }}{{ with .Description }}{{ . }}{{ end }}{{ end }}">
+  {{ if .Params.metakeys }}
+  <meta name="keywords" content="{{ delimit .Params.metakeys ", " }}">
+  {{ end }}
+  <meta name="author" content="{{ .Site.Params.author }}">
 
-    <meta name="twitter:card" content="summary">
-    {{ with .Site.Params.twitterName }}
-    <meta name="twitter:site" content="@{{ . }}" />
-    <meta name="twitter:creator" content="@{{ . }}" />
-    {{ end }}
-    <meta name="twitter:title" content="{{ .Title }}">
-    <meta name="twitter:description" content="{{ if .IsNode }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ else }}{{ with .Description }}{{ . }}{{ end }}{{ end }}">
-    <meta property="og:title" content="{{ .Title }}">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="{{ .Permalink }}" />
-    <meta property="og:description" content="{{ if .IsNode }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ else }}{{ with .Description }}{{ . }}{{ end }}{{ end }}">
-    {{ if .Params.image }}
-    <meta property="og:image" content="{{ .Site.BaseURL }}{{ .Params.image }}" />
-    <meta name="twitter:image" content="{{ .Site.BaseURL }}{{ .Params.image }}" />
-    {{ else }}
-    <meta property="og:image" content="https://www.gravatar.com/avatar/530ee2111e51f3d8379b1081d13bf345.png?s=400" />
-    <meta name="twitter:image" content="https://www.gravatar.com/avatar/530ee2111e51f3d8379b1081d13bf345.png?s=400" />
-    {{ end }}
-    <meta property="og:updated_time" content="{{ .Date }}"/>
-    <meta property="article:author" content="https://twitter.com/{{ .Site.Params.twitterName }}"/>
+  <meta name="twitter:card" content="summary">
+  {{ with .Site.Params.twitterName }}
+  <meta name="twitter:site" content="@{{ . }}" />
+  <meta name="twitter:creator" content="@{{ . }}" />
+  {{ end }}
+  <meta name="twitter:title" content="{{ .Title }}">
+  <meta name="twitter:description"
+    content="{{ if .IsNode }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ else }}{{ with .Description }}{{ . }}{{ end }}{{ end }}">
+  <meta property="og:title" content="{{ .Title }}">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="{{ .Permalink }}" />
+  <meta property="og:description"
+    content="{{ if .IsNode }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ else }}{{ with .Description }}{{ . }}{{ end }}{{ end }}">
+  {{ if .Params.image }}
+  <meta property="og:image" content="{{ .Site.BaseURL }}{{ .Params.image }}" />
+  <meta name="twitter:image" content="{{ .Site.BaseURL }}{{ .Params.image }}" />
+  {{ else }}
+  <meta property="og:image" content="https://www.gravatar.com/avatar/530ee2111e51f3d8379b1081d13bf345.png?s=400" />
+  <meta name="twitter:image" content="https://www.gravatar.com/avatar/530ee2111e51f3d8379b1081d13bf345.png?s=400" />
+  {{ end }}
+  <meta property="og:updated_time" content="{{ .Date }}" />
+  <meta property="article:author" content="https://twitter.com/{{ .Site.Params.twitterName }}" />
 
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700%7COxygen:400,700" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="https://yui-s.yahooapis.com/pure/0.6.0/pure-min.css">
-    <link rel="stylesheet" href="https://yui-s.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700%7COxygen:400,700" rel="stylesheet"
+    type="text/css">
+  <link rel="stylesheet" href="https://yui-s.yahooapis.com/pure/0.6.0/pure-min.css">
+  <link rel="stylesheet" href="https://yui-s.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
 
-    <link rel="stylesheet" href='{{ "css/all.min.css" | absURL }}'>
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href='{{ "css/all.css" | absURL }}'>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 
-    {{ $rss := .OutputFormats.Get "RSS" }}
-    {{ if $rss }}
-    <link href="{{ $rss.RelPermalink }}" rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" />
-    <link href="{{ $rss.RelPermalink }}" rel="feed" type="application/rss+xml" title="{{ .Site.Title }}" />
-    {{ end }}
-    <script type="application/ld+json">
-    [
-      {
-        "@context" : "http://schema.org",
-        "@type" : "WebSite",
-        "name" : "FireFart",
-        "url" : "https://firefart.at"
+  {{ $rss := .OutputFormats.Get "RSS" }}
+  {{ if $rss }}
+  <link href="{{ $rss.RelPermalink }}" rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" />
+  <link href="{{ $rss.RelPermalink }}" rel="feed" type="application/rss+xml" title="{{ .Site.Title }}" />
+  {{ end }}
+  <script type="application/ld+json">
+    [{
+        "@context": "http://schema.org",
+        "@type": "WebSite",
+        "name": "FireFart",
+        "url": "https://firefart.at"
       },
       {
-        "@context" : "http://schema.org",
-        "@type" : "Person",
-        "name" : "Christian Mehlmauer",
-        "url" : "https://firefart.at",
-        "sameAs" : [
+        "@context": "http://schema.org",
+        "@type": "Person",
+        "name": "Christian Mehlmauer",
+        "url": "https://firefart.at",
+        "sameAs": [
           "https://twitter.com/firefart",
           "https://github.com/FireFart",
           "https://www.facebook.com/christian.mehlmauer"
         ]
       }
     ]
-    </script>
+  </script>
 
 </head>
+
 <body>

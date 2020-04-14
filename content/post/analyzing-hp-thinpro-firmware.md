@@ -11,7 +11,7 @@ Here is my solution to run the Firmware in a VMware Infrastructure, or simply mo
 
 First you need to download the ThinPro Firmware for your Thinclient model from HP's Downloadcenter. Here is the link for the T510:
 
-[http://h20000.www2.hp.com/bizsupport/TechSupport/SoftwareDescription.jsp?lang=en&amp;cc=us&amp;prodTypeId=12454&amp;prodSeriesId=5226831&amp;prodNameId=5226832&amp;swEnvOID=4030&amp;swLang=13&amp;mode=2&amp;taskId=135&amp;swItem=vc-117698-1](http://h20000.www2.hp.com/bizsupport/TechSupport/SoftwareDescription.jsp?lang=en&amp;cc=us&amp;prodTypeId=12454&amp;prodSeriesId=5226831&amp;prodNameId=5226832&amp;swEnvOID=4030&amp;swLang=13&amp;mode=2&amp;taskId=135&amp;swItem=vc-117698-1)
+[http://h20000.www2.hp.com/bizsupport/TechSupport/SoftwareDescription.jsp?lang=en&amp;cc=us&amp;prodTypeId=12454&amp;prodSeriesId=5226831&amp;prodNameId=5226832&amp;swEnvOID=4030&amp;swLang=13&amp;mode=2&amp;taskId=135&amp;swItem=vc-117698-1](http://h20000.www2.hp.com/bizsupport/TechSupport/SoftwareDescription.jsp?lang=en&cc=us&prodTypeId=12454&prodSeriesId=5226831&prodNameId=5226832&swEnvOID=4030&swLang=13&mode=2&taskId=135&swItem=vc-117698-1)
 
 After you finished the download you will get an exe containing the firmware. Run this file under Windows, select the Button named "Image" and save the extracted image.
 
@@ -47,7 +47,7 @@ DECIMAL         HEX             DESCRIPTION
 679509504       0x28807E00      Linux EXT filesystem, rev 1.0 ext3 filesystem data, UUID=c0cba688-cc23-404f-a7fb-d67fde13de13, volume name "ROOT"
 ```
 
-To convert this image to a VMware Harddisk you first need to install the package ***qemu*** (if you only want to browse this image, scroll down a bit).
+To convert this image to a VMware Harddisk you first need to install the package **_qemu_** (if you only want to browse this image, scroll down a bit).
 
 To start the conversion run the following command:
 

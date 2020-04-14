@@ -11,8 +11,8 @@ The installation was tested with Ubuntu 14.04 LTS 64bit.
 
 Here are my steps to get a Wordpress VM up and running in Ubuntu:
 
-* Get the Ubuntu ISO image from their download site [http://www.ubuntu.com/download/server](http://www.ubuntu.com/download/server)
-* Install it in your favourite VM software using the defaults
+- Get the Ubuntu ISO image from their download site [http://www.ubuntu.com/download/server](http://www.ubuntu.com/download/server)
+- Install it in your favourite VM software using the defaults
 
 I personally like to add the IP of the VM to the login dialog so i can spot the IP when booting the VM without logging in, and then use putty or something else to SSH into the machine.
 To add the IP to the login screen we have to change the `/etc/issue` file. Because this is only a text file, we need to add the IP on boot to it. So add the following lines to your `/etc/rc.local` file (right above the `exit 0;` statement):

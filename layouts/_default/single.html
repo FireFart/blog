@@ -15,23 +15,24 @@
 
                         <p class="post-meta">
                             {{ with .Params.author }}
-                                By <strong class="post-author">{{ . }}</strong>
+                            By <strong class="post-author">{{ . }}</strong>
                             {{ end }}
                             {{ if isset .Params "categories" }}
-                                under
-                                {{ range .Params.categories }}
-                                    <a class="post-category post-category-{{ . }}" href='{{ ( printf "categories/%s" . ) | absURL }}'>{{ . }}</a>
-                                {{ end }}
+                            under
+                            {{ range .Params.categories }}
+                            <a class="post-category post-category-{{ . }}"
+                                href='{{ ( printf "categories/%s" . ) | absURL }}'>{{ . }}</a>
+                            {{ end }}
                             {{ end }}
                         </p>
                     </header>
 
                     <div id="toc" class="well col-md-4 col-sm-6">
-                      {{ .TableOfContents }}
+                        {{ .TableOfContents }}
                     </div>
 
                     <div class="post-description">
-                      {{ .Content }}
+                        {{ .Content }}
                     </div>
                 </section>
             </div>
@@ -40,4 +41,5 @@
     </div>
 </div>
 </body>
+
 </html>

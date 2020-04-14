@@ -23,7 +23,9 @@ I tested the latest version of the loader available for download at the time of 
 The fixed version is 2.46. Some vulnerabilities like the phpinfo are not fixed because they represent the functionality of the script. Ioncube added a notice on top of every page to remove the file after successful installation.
 
 # phpinfo exposure
+
 When calling the page `phpinfo` the scripts executes `phpinfo()` and presents the contents.
+
 ```
 http://server.com/loader-wizard.php?page=phpinfo
 ```
@@ -31,6 +33,7 @@ http://server.com/loader-wizard.php?page=phpinfo
 ![phpinfo](/img/ioncube/phpinfo.png "phpinfo")
 
 # php.ini exposure
+
 When calling the page `phpconfig` the scripts reads your `php.ini` settings file and prints out all the contents.
 
 ```
@@ -40,6 +43,7 @@ http://server.com/loader-wizard.php?page=phpconfig
 ![phpconfig](/img/ioncube/phpconfig.png "phpconfig")
 
 # extra information
+
 When calling the page `extra` the scripts outputs some additional informations about the server.
 
 ```
@@ -49,6 +53,7 @@ http://server.com/loader-wizard.php?page=extra
 ![extra](/img/ioncube/extra.png "extra")
 
 # Download configs as zipped file
+
 When calling the page `system_info_archive` it's possible to download a zip file containing a copy of the `php.ini`, `phpinfo()` output and the extra informations printed on the `extra` page.
 
 ```
@@ -58,6 +63,7 @@ http://server.com/loader-wizard.php?page=system_info_archive
 ![archive](/img/ioncube/system_info_archive.png "archive")
 
 # reflected XSS
+
 The script uses the PHP variable `$self` in various places. It's possible to inject script code in the script name and thus the script is vulnerable to reflected cross site scripting.
 
 ```
@@ -82,6 +88,7 @@ setTimeout("window.location.href = '/loader-wizard.php/<xss>?page=default&amp;ti
 ![xss](/img/ioncube/xss.png "xss")
 
 # Get arbitrary file on server
+
 The page `phpconfig` can be abused to download arbitrary files the webserver has access to.
 
 ```
@@ -141,6 +148,7 @@ function phpconfig_page()
 ```
 
 # Timeline
+
 02.03.2014 - Contacted Vendor
 
 02.03.2014 - Response from vendor, will be fixed asap

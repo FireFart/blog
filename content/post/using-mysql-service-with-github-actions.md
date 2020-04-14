@@ -16,7 +16,7 @@ You need to be careful with this setup because if you use the default port your 
 
 The following YML code can be used as an example for such an action.
 
-In the `services` section we define which database docker image to start (`mariadb:latest` in this case) and which ports are exposed. The Environment variables passed to it are used by the docker image to create the initial database and specify the users. See [https://hub.docker.com/_/mariadb/](https://hub.docker.com/_/mariadb/) or [https://hub.docker.com/_/mysql](https://hub.docker.com/_/mysql) for more details. The `options` specified are passed to docker for it's internal healthcheck. This command ensures that the database is reachable during the tests and docker will auto restart the container if the command specified fails for `health-retries` times.
+In the `services` section we define which database docker image to start (`mariadb:latest` in this case) and which ports are exposed. The Environment variables passed to it are used by the docker image to create the initial database and specify the users. See [https://hub.docker.com/\_/mariadb/](https://hub.docker.com/_/mariadb/) or [https://hub.docker.com/\_/mysql](https://hub.docker.com/_/mysql) for more details. The `options` specified are passed to docker for it's internal healthcheck. This command ensures that the database is reachable during the tests and docker will auto restart the container if the command specified fails for `health-retries` times.
 In the `Verify MariaDB connection` section a simple `mysqladmin ping` is executed to ensure the database is fully up and running before continuing with the tests. As the port from the container is mapped to a random port on the host we also need to grab it via the exposed variable `${{ job.services.mariadb.ports[3306] }}` and pass it via an environment variable to the command.
 
 ```yml
@@ -41,17 +41,17 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
 
     steps:
-    - uses: actions/checkout@v1
+      - uses: actions/checkout@v1
 
-    - name: Verify MariaDB connection
-      env:
-        PORT: ${{ job.services.mariadb.ports[3306] }}
-      run: |
-        while ! mysqladmin ping -h"127.0.0.1" -P"$PORT" --silent; do
-          sleep 1
-        done
+      - name: Verify MariaDB connection
+        env:
+          PORT: ${{ job.services.mariadb.ports[3306] }}
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" -P"$PORT" --silent; do
+            sleep 1
+          done
 
-    - name: Test
-      run: |
-        your tests
+      - name: Test
+        run: |
+          your tests
 ```

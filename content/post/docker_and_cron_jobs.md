@@ -126,7 +126,7 @@ In `docker-compose` use the following:
 
 ```yml
 volumes:
-    - /etc/localtime:/etc/localtime:ro
+  - /etc/localtime:/etc/localtime:ro
 ```
 
 In docker use the following command line option:

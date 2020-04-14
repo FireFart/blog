@@ -7,7 +7,7 @@ image = "/img/misc/hacker.jpg"
 
 On a recent pentest I got root access to a MySQL database hosting a PHP web application and also an instance of [Piwik](https://piwik.org/). I was able to extract the credentials from the database and crack them really fast because they were only hashed using MD5. It looks like Piwik introduced stronger hashes in Piwik 3 but luckily this target is still running version 2.
 
-**Edit**:  *Piwik now disabled custom plugin uploads by default in 3.0.3 ([Changelog](https://piwik.org/changelog/piwik-3-0-3/)). You have to manually enable it in the config (See [FAQ](https://piwik.org/faq/plugins/faq_21/)) so this removes a lot attack surface from existing installs.*
+**Edit**: _Piwik now disabled custom plugin uploads by default in 3.0.3 ([Changelog](https://piwik.org/changelog/piwik-3-0-3/)). You have to manually enable it in the config (See [FAQ](https://piwik.org/faq/plugins/faq_21/)) so this removes a lot attack surface from existing installs._
 
 <!--more-->
 
@@ -22,6 +22,7 @@ The plugin generally consist of a `plugin.json` containing some metadata showed 
 You can write a super fancy plugin adding new menus to the dashboard and showing some nice remote code execution pages with templates but that's way too much work. Luckily there is a `install` method which will be called when the plugin is activated. So this looks like a good place to put a payload in.
 
 If we write a plugin called **pwned** the folder structure would be:
+
 ```
 pwned/
 pwned/pwned.php
@@ -31,6 +32,7 @@ pwned/plugin.json
 And the file content:
 
 **pwned.php**
+
 ```php
 <?php
 namespace Piwik\Plugins\pwned;
@@ -43,6 +45,7 @@ class pwned extends \Piwik\Plugin {
 ```
 
 **plugin.json**
+
 ```json
 {
   "name": "pwned",

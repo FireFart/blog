@@ -79,9 +79,9 @@ All values should be properly escaped before they are output to HTML. This issue
 
 **All Issues were fixed in the following versions:**
 
-*Lite version:* 1.10
+_Lite version:_ 1.10
 
-*Standard version:* 1.10.1-standard
+_Standard version:_ 1.10.1-standard
 
 **Timeline:**
 
@@ -98,4 +98,4 @@ All values should be properly escaped before they are output to HTML. This issue
 03.10.2013: Standard Plugin fixed ([http://time.ly/1-10-1-now-available-for-some-standard-users/](http://time.ly/1-10-1-now-available-for-some-standard-users/))
 
 **Additional URLs:**
-*Secunia Advisory:* [http://secunia.com/advisories/54038/](http://secunia.com/advisories/54038/)
+_Secunia Advisory:_ [http://secunia.com/advisories/54038/](http://secunia.com/advisories/54038/)
